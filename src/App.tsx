@@ -8,85 +8,85 @@ const App: React.FC = () => {
   const [workTime, setWorkTime] = useState(0.2 * 60 * 1000);
   const [shortBrake, setShortBrake] = useState(0.1 * 60 * 1000);
   const [longBrake, setLongBrake] = useState(25 * 60 * 1000);
-  const [cycles, setCycles]  = useState(7);
+  const [maxCycles, setMaxCycles]  = useState(7);
   const [currentCycle, setCurrentCycle] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [currentCountdown, setCurrentCountdown] = useState(0);
+  const [currentCountdown, setCurrentCountdown] = useState(() => workTime);
   const [isStarted, setIsStarted] = useState(false);
 
-  // Interface to prevent TS error
-  interface RefInf {
-    current: any
+  let totalTimer : {current: any} = useRef();
+  let countdownTimer : {current: any} = useRef();
+
+  // apply interval to ref variable
+  function startTotalTimer() {
+    totalTimer.current = setInterval(() => {
+      setCurrentTime(prevVal => {
+        return prevVal + 1000;
+      })
+    }, 1000)
   }
-  //Add component variable to handle clears
-  let countdownTimer : RefInf = useRef();
-  let totalTimer : RefInf = useRef(); 
- 
+
+  function startCountdownTimer() {
+    countdownTimer.current = setInterval(() => {
+      setCurrentCountdown(prevVal => {
+        return prevVal - 1000;
+      })
+    }, 1000)
+  }
+
+
+  // Function that starts timers
+  function startTimers() {
+    startTotalTimer();
+    startCountdownTimer();
+    setIsStarted(prev => !prev);
+  }
+  // function that stops timers
+  function stopTimers() {
+    clearInterval(totalTimer.current);
+    clearInterval(countdownTimer.current);
+    setIsStarted(prev => !prev);
+  }
+
+  function nextCycle() {
+    setCurrentCycle(prevVal => {
+      if (prevVal < maxCycles) {
+        return prevVal + 1;
+      }else {
+        return 0;
+      }
+    })
+  }
+
+  function nextCountdown() {
+    if(currentCycle % 2 === 0) {
+      setCurrentCountdown(workTime);
+    } else if ( currentCycle !== maxCycles) {
+      setCurrentCountdown(shortBrake);
+    } else {
+      setCurrentCountdown(longBrake);
+    }
+  }
+  // effect for checking that countdown ends
   useEffect(() => {
     if(currentCountdown < 1000) {
-      clearInterval(countdownTimer.current);
-      navigator.vibrate([900, 300, 900, 300, 900]);
-      incrementCycle();
-      swapTimers();
+      navigator.vibrate([1000, 500, 1000]);
+      nextCycle();
     }
   }, [currentCountdown]);
-  
-function swapTimers() {
-  if(currentCycle % 2 === 0)  {
-    countdownTimer.current = startCountdown(workTime);
-  } else {
-    countdownTimer.current = startCountdown(shortBrake);
-  }
-}
 
-
-function incrementCycle() {
-  setCurrentCycle(prevCycle => {
-    if(prevCycle < cycles) {
-      return prevCycle + 1;
-    } else {
-      return 0;
-    }
-  });
-}
-
-//function that start timer
-function startTimer() {
-  let startTime = new Date().getTime();
-    return setInterval(() => {
-      setCurrentTime(() => {
-        return new Date().getTime() - startTime;
-      })
-    }, 1000)
-}
-
-function startCountdown(time: number) {
-  let startTime = new Date().getTime();
-    return setInterval(() => {
-      setCurrentCountdown(() => {
-        return startTime -  new Date().getTime() + time;
-      })
-    }, 1000)
-}
-
-function startClocks() {
-  totalTimer.current = startTimer();
-  countdownTimer.current = startCountdown(currentCountdown);
-  setIsStarted(prev => !prev);
-}
-
-function stopClocks() {
-  clearInterval(totalTimer.current);
-  clearInterval(countdownTimer.current);
-  setIsStarted(prev => !prev);
-}
+  // effect for correct display of timers
+  useEffect(() => {
+    nextCountdown();
+  }, [currentCycle])
 
   return (
     <div className="App">
+      <h1>Pomodoro timer</h1>
       <Timer timer={currentTime}/>
       <Timer timer={currentCountdown} />
       {currentCycle}
-      {!isStarted ? <button onClick={startClocks}>Start</button> : <button onClick={stopClocks}>Stop</button>}
+      {!isStarted ? <button onClick={startTimers}>Start</button> : <button onClick={stopTimers}>Stop</button>}
     </div>
   );
 }
