@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
 import './App.css';
-import Timer from './components/Timer/Timer';;
-
-
+import Timer from './components/Timer/Timer';
+import parseTime from './utils/parseTime'
+import displayCurrentCycle from './utils/displayCurrentCycle';
 
 const App: React.FC = () => {
   const [workTime, setWorkTime] = useState(0.2 * 60 * 1000);
@@ -13,11 +13,18 @@ const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [currentCountdown, setCurrentCountdown] = useState(() => workTime);
   const [isStarted, setIsStarted] = useState(false);
+  const [shouldBeAuto, setShouldBeAuto] = useState(true);
 
   let totalTimer : {current: any} = useRef();
   let countdownTimer : {current: any} = useRef();
+  let checkboxInput : {current: any} = useRef();
+  let soundEffect : {current: any} = useRef();
+  // Loading on mount
+  useEffect(() => {
+    soundEffect.current = new Audio(process.env.PUBLIC_URL + '/school_bell.wav');
+  }, [])
 
-  // apply interval to ref variable
+  // Adding interval to ref variable
   function startTotalTimer() {
     totalTimer.current = setInterval(() => {
       setCurrentTime(prevVal => {
@@ -39,13 +46,13 @@ const App: React.FC = () => {
   function startTimers() {
     startTotalTimer();
     startCountdownTimer();
-    setIsStarted(prev => !prev);
+    setIsStarted(true);
   }
   // function that stops timers
   function stopTimers() {
     clearInterval(totalTimer.current);
     clearInterval(countdownTimer.current);
-    setIsStarted(prev => !prev);
+    setIsStarted(false);
   }
 
   function nextCycle() {
@@ -67,11 +74,28 @@ const App: React.FC = () => {
       setCurrentCountdown(longBrake);
     }
   }
-  // effect for checking that countdown ends
+
+  function clearTimers() {
+    stopTimers();
+    setCurrentCountdown(workTime);
+    setCurrentTime(0);
+    setCurrentCycle(0);
+  }
+
   useEffect(() => {
+    // Displaying text in title
+    let time = parseTime(currentCountdown);
+    document.title = `${displayCurrentCycle(currentCycle, maxCycles)} - ${time.minutes}:${time.seconds}`;
+    // Handler for countdown ends
     if(currentCountdown < 1000) {
+      // There should be any bling bling sounds
+      soundEffect.current.play();
       navigator.vibrate([1000, 500, 1000]);
       nextCycle();
+      // Handler for not auto actions
+      if(!shouldBeAuto) {
+        stopTimers();
+      } 
     }
   }, [currentCountdown]);
 
@@ -85,8 +109,15 @@ const App: React.FC = () => {
       <h1>Pomodoro timer</h1>
       <Timer timer={currentTime}/>
       <Timer timer={currentCountdown} />
-      {currentCycle}
+      {displayCurrentCycle(currentCycle, maxCycles)}
       {!isStarted ? <button onClick={startTimers}>Start</button> : <button onClick={stopTimers}>Stop</button>}
+      <input 
+        type='checkbox'
+        defaultChecked 
+        onClick={()=> {setShouldBeAuto(prev => !prev)}}
+        id="checkbox"/>
+        <label htmlFor="checkbox">Auto?</label>
+        <button onClick={clearTimers}> Clear</button>
     </div>
   );
 }
