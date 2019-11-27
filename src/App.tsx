@@ -1,13 +1,13 @@
 import React, {useState, useEffect, useRef} from 'react';
-import './App.css';
+import './scss/App.scss';
 import Timer from './components/Timer/Timer';
 import parseTime from './utils/parseTime'
 import displayCurrentCycle from './utils/displayCurrentCycle';
 
 const App: React.FC = () => {
-  const [workTime, setWorkTime] = useState(0.2 * 60 * 1000);
-  const [shortBrake, setShortBrake] = useState(0.1 * 60 * 1000);
-  const [longBrake, setLongBrake] = useState(25 * 60 * 1000);
+  const [workTime, setWorkTime] = useState(25 * 60 * 1000);
+  const [shortBrake, setShortBrake] = useState(5 * 60 * 1000);
+  const [longBrake, setLongBrake] = useState(15 * 60 * 1000);
   const [maxCycles, setMaxCycles]  = useState(7);
   const [currentCycle, setCurrentCycle] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -17,7 +17,6 @@ const App: React.FC = () => {
 
   let totalTimer : {current: any} = useRef();
   let countdownTimer : {current: any} = useRef();
-  let checkboxInput : {current: any} = useRef();
   let soundEffect : {current: any} = useRef();
   // Loading on mount
   useEffect(() => {
@@ -106,18 +105,35 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <h1>Pomodoro timer</h1>
-      <Timer timer={currentTime}/>
-      <Timer timer={currentCountdown} />
-      {displayCurrentCycle(currentCycle, maxCycles)}
-      {!isStarted ? <button onClick={startTimers}>Start</button> : <button onClick={stopTimers}>Stop</button>}
-      <input 
-        type='checkbox'
-        defaultChecked 
-        onClick={()=> {setShouldBeAuto(prev => !prev)}}
-        id="checkbox"/>
-        <label htmlFor="checkbox">Auto?</label>
-        <button onClick={clearTimers}> Clear</button>
+      <h1 className="App__header">Pomodoro timer</h1>
+
+      <section>
+        <Timer timer={currentTime} wrapperClass="App__timer--total"/>
+        <Timer timer={currentCountdown} wrapperClass="App__timer--countdown" />
+        <span className="App__currentCycle">
+          {displayCurrentCycle(currentCycle, maxCycles)}
+        </span>
+        {!isStarted ? 
+          <button onClick={startTimers} className="App__button--start">Start</button> 
+          :
+          <button onClick={stopTimers} className="App__button--stop">Stop</button>
+        }
+        <input 
+          type='checkbox'
+          defaultChecked 
+          onClick={()=> {setShouldBeAuto(prev => !prev)}}
+          id="checkbox"
+          className="App__checkbox"/>
+        <label 
+          htmlFor="checkbox"
+          className={['App__checkbox--label', shouldBeAuto ? 'selected' : null].join(' ')}>
+          Auto? 
+            <span className="App__checkbox--check"> 
+            {shouldBeAuto ? String.fromCharCode(10004) :  String.fromCharCode(9932)}
+            </span>
+          </label>
+          <button onClick={clearTimers} className="App__button--clear"> Clear</button> 
+      </section>
     </div>
   );
 }

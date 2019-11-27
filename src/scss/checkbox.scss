@@ -1,0 +1,32 @@
+// Checkbox button setup
+$activeColor: lightblue;
+
+.App__checkbox{
+  display: none;
+}
+
+.App__checkbox--label{
+  padding: 5px;
+  border: 1px solid gray;
+  border-radius: 15px;
+  font-size: 1.5rem;
+  &:hover{
+    background-color: dimgray;
+    color: white;
+  }
+}
+
+.selected {
+  background-color: $activeColor;
+  color: black;
+  border-color: white;
+  &:hover{
+    background-color: lighten($activeColor, 5%);
+    color: black;
+  }
+}
+
+.App__checkbox--check {
+  position: relative;
+  left: 10px;
+}

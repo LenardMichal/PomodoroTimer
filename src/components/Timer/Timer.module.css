@@ -1,0 +1,9 @@
+.Timer {
+  display: flex;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.Timer span {
+  width: 1rem;
+}

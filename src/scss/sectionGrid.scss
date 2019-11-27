@@ -1,0 +1,29 @@
+
+// Grid setup
+
+/* wrapper for all elements w/o header */
+section {
+  margin-top: 50px;
+  display: grid;
+  height: 100%;
+}
+
+.App__timer--countdown{
+  grid-row: 1/2;
+}
+
+.App__currentCycle{
+  grid-row: 2/3;
+}
+
+.App__button--start, .App__button--stop, .App__button--clear {
+  grid-row: 3/4;
+}
+
+.App__button--clear{
+  grid-row: 4/5;
+}
+
+.App__checkbox--label {
+  grid-row: 5/6;
+}

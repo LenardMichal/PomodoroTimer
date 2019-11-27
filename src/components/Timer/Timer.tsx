@@ -1,18 +1,24 @@
 import React from 'react';
 import parseTime from '../../utils/parseTime';
+import styles from './Timer.module.css';
 
 interface TimerProps  {
-  timer: number
+  timer: number;
+  wrapperClass?: string;
 }
 
-const Timer = ({timer}: TimerProps) => {
+const Timer = ({timer, wrapperClass = ''}: TimerProps) => {
   let time = parseTime(timer);
 
-  return <div>
-    {time.hours}
-    { Number(time.seconds) % 2 === 0 ? ':' : ' '}
+  return <div className={[styles.Timer, wrapperClass].join(' ')}>
+    {time.hours !== '00' ? time.hours : null}
+    <span>
+      { Number(time.seconds) % 2 === 0  && time.hours !== '00' ? ':' : ' '}  
+    </span>
     {time.minutes}
-    { Number(time.seconds) % 2 === 0 ? ':' : ' '}
+    <span>
+      { Number(time.seconds) % 2 === 0 ? ':' : ' '}
+    </span>
     {time.seconds}
   </div>
 } 
