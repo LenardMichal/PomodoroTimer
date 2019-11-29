@@ -3,11 +3,12 @@ import './scss/App.scss';
 import Timer from './components/Timer/Timer';
 import parseTime from './utils/parseTime'
 import displayCurrentCycle from './utils/displayCurrentCycle';
+import SettingsWindow from './components/SettingsWindow/SettingsWindow';
 
 const App: React.FC = () => {
   const [workTime, setWorkTime] = useState(25 * 60 * 1000);
   const [shortBrake, setShortBrake] = useState(5 * 60 * 1000);
-  const [longBrake, setLongBrake] = useState(15 * 60 * 1000);
+  const [longBrake, setLongBrake] = useState(20 * 60 * 1000);
   const [maxCycles, setMaxCycles]  = useState(7);
   const [currentCycle, setCurrentCycle] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   // Loading on mount
   useEffect(() => {
     soundEffect.current = new Audio(process.env.PUBLIC_URL + '/school_bell.wav');
+    soundEffect.current.volume = 0.5;
   }, [])
 
   // Adding interval to ref variable
@@ -81,6 +83,10 @@ const App: React.FC = () => {
     setCurrentCycle(0);
   }
 
+  function setVolume(val : number = 0) {
+    soundEffect.current.volume = val;
+  }
+
   useEffect(() => {
     // Displaying text in title
     let time = parseTime(currentCountdown);
@@ -134,6 +140,7 @@ const App: React.FC = () => {
           </label>
           <button onClick={clearTimers} className="App__button--clear"> Clear</button> 
       </section>
+      <SettingsWindow setVolume={setVolume}/>
     </div>
   );
 }

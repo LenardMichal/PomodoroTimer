@@ -1,7 +1,6 @@
 $buttonBgColor: red;
 
-
-.App__button--start, .App__button--stop, .App__button--clear{
+@mixin buttonGlobal {
   border: none;
   border-radius: 15px;
   padding: 10px;
@@ -13,5 +12,10 @@ $buttonBgColor: red;
     background-color: lighten($buttonBgColor, 10%);
   }
 }
+
+.App__button--start, .App__button--stop, .App__button--clear{
+  @include buttonGlobal;
+}
+
 
 
