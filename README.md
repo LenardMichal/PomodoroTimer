@@ -1,5 +1,6 @@
 # Pomodoro Timer
-Project of simple timer prepared for pwa.
+Simple timer:
+https://pomodoro-timer-695de.firebaseapp.com/
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
